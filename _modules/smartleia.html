@@ -1,0 +1,1450 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>smartleia &mdash; LEIA 0.2.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="http://wavedrom.com/skins/default.js"></script>
+        <script src="http://wavedrom.com/wavedrom.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> LEIA
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../target.html">1. About the LEIA project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hard.html">4. Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../c/test.html">5. Firmware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">6. Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publi.html">7. Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">8. Roadmap</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">LEIA</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>smartleia</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for smartleia</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Here is detailed the python API of the `smartleia` package.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">ctypes</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span><span class="p">,</span> <span class="n">IntFlag</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">serial</span>
+<span class="kn">import</span> <span class="nn">serial.tools.list_ports</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;TriggerPoints&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;T&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Triggers&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TriggerStrategy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;create_APDU_from_bytes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;APDU&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RESP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ATR&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LEIA&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.0.1&quot;</span>
+
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;smartleia&quot;</span>
+
+
+<span class="n">COMMAND_LEN_SIZE</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">RESPONSE_LEN_SIZE</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">TRIGGER_DEPTH</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">STRATEGY_MAX</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="c1"># Maximum size of APDU payload size</span>
+<span class="c1"># NOTE: because of firmware SRAM constraints, we only</span>
+<span class="c1"># support this size for now.</span>
+<span class="n">MAX_APDU_PAYLOAD_SIZE</span> <span class="o">=</span> <span class="mi">16384</span>
+
+<span class="n">ERR_FLAGS</span> <span class="o">=</span> <span class="p">{</span><span class="mh">0x00</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">:</span> <span class="s2">&quot;PLATFORM_ERR_CARD_NOT_INSERTED&quot;</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">:</span> <span class="s2">&quot;UNKNOWN_ERROR&quot;</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">LEIAStructure</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base structure for exchanging data with LEIA.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)[:]</span>
+
+    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">by</span><span class="p">):</span>
+        <span class="n">fit</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">by</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">ctypes</span><span class="o">.</span><span class="n">memmove</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">by</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">normalized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{:02x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalized</span><span class="p">()])</span>
+
+
+<span class="k">class</span> <span class="nc">ByteStruct</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">)]</span>
+
+
+<span class="k">class</span> <span class="nc">Timers</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;delta_t&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;delta_t_answer&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta_t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">delta_t_answer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a Timers structure.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            delta_t (int) : total time for the APDU.</span>
+<span class="sd">            delta_t_answer (int) : answer time for the APDU.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">LEIAStructure</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta_t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">delta_t_answer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta_t_answer</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Timers(</span>
+<span class="s2">        delta_t=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_t</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> microseconds,</span>
+<span class="s2">        delta_t_answer=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_t_answer</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> microseconds,</span>
+<span class="s2">        )&quot;&quot;&quot;</span>
+ 
+<span class="c1">##### Triggers handling ######</span>
+<div class="viewcode-block" id="TriggerPoints"><a class="viewcode-back" href="../api.html#smartleia.TriggerPoints">[docs]</a><span class="k">class</span> <span class="nc">TriggerPoints</span><span class="p">(</span><span class="n">IntFlag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class utility to reference the trigger points available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: Point before getting the ATR.</span>
+    <span class="n">TRIG_GET_ATR_PRE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">0</span>
+
+    <span class="c1">#: Point just after the ATR has been received.</span>
+    <span class="n">TRIG_GET_ATR_POST</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span>
+
+    <span class="c1">#: Point just before sending a simple APDU in T=0.</span>
+    <span class="n">TRIG_PRE_SEND_APDU_SHORT_T0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span>
+
+    <span class="c1">#: Point just before sending a fragmented APDU in T=0.</span>
+    <span class="n">TRIG_PRE_SEND_APDU_FRAGMENTED_T0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span>
+
+    <span class="c1">#: Point just before sending an APDU in T=1.</span>
+    <span class="n">TRIG_PRE_SEND_APDU_T1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span>
+
+    <span class="c1">#: Point just before sending an APDU</span>
+    <span class="n">TRIG_PRE_SEND_APDU</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">TRIG_PRE_SEND_APDU_SHORT_T0</span>
+        <span class="o">|</span> <span class="n">TRIG_PRE_SEND_APDU_FRAGMENTED_T0</span>
+        <span class="o">|</span> <span class="n">TRIG_PRE_SEND_APDU_T1</span>
+    <span class="p">)</span>
+
+    <span class="c1">#: Point just before receiving a RESP in T=0.</span>
+    <span class="n">TRIG_POST_RESP_T0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">6</span>
+
+    <span class="c1">#: Point just before receiving a RESP in T=1.</span>
+    <span class="n">TRIG_POST_RESP_T1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span>
+
+    <span class="c1">#: Point just before receiving a RESP</span>
+    <span class="n">TRIG_POST_RESP</span> <span class="o">=</span> <span class="n">TRIG_POST_RESP_T0</span> <span class="o">|</span> <span class="n">TRIG_POST_RESP_T1</span>
+
+    <span class="c1">#: Point just after sending a byte through the ISO7816 interface.</span>
+    <span class="n">TRIG_IRQ_PUTC</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span>
+
+    <span class="c1">#: Point juster afted a byte has been received through the ISO7816 interface.</span>
+    <span class="n">TRIG_IRQ_GETC</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">9</span></div>
+
+
+<div class="viewcode-block" id="Triggers"><a class="viewcode-back" href="../api.html#smartleia.Triggers">[docs]</a><span class="k">class</span> <span class="nc">Triggers</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="c1"># NOTE: you can improve your trigger strategies here by adding new ones</span>
+    <span class="c1"># or existing ones!</span>
+    <span class="c1">#: Triggers at the beginning and end of ATR: first trig just before</span>
+    <span class="c1"># reading ATR, second trig after we have got the ATR</span>
+    <span class="n">MULTI_TRIG_ATR</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">TriggerPoints</span><span class="o">.</span><span class="n">TRIG_GET_ATR_PRE</span><span class="p">,</span>
+        <span class="n">TriggerPoints</span><span class="o">.</span><span class="n">TRIG_GET_ATR_POST</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="c1"># Triggers after the first byte of an APDU has been sent: first trig</span>
+    <span class="c1"># just after we have sent our APDU command, second trig when receiving</span>
+    <span class="c1"># the first response byte from the card.</span>
+    <span class="n">MULTI_TRIG_AFTER_1ST_BYTE_SEND_APDU</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">TriggerPoints</span><span class="o">.</span><span class="n">TRIG_PRE_SEND_APDU</span><span class="p">,</span>
+        <span class="n">TriggerPoints</span><span class="o">.</span><span class="n">TRIG_IRQ_PUTC</span><span class="p">,</span>
+    <span class="p">]</span></div>
+    
+
+<div class="viewcode-block" id="TriggerStrategy"><a class="viewcode-back" href="../api.html#smartleia.TriggerStrategy">[docs]</a><span class="k">class</span> <span class="nc">TriggerStrategy</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        delay (int): the delay between event detection and effective trig on GPIO in milliseconds.</span>
+<span class="sd">        point_list (list[int]): the list of events to match.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;delay&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;single&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;_list&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span> <span class="o">*</span> <span class="n">TRIGGER_DEPTH</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;_list_trigged&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span> <span class="o">*</span> <span class="n">TRIGGER_DEPTH</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;_cnt_trigged&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span> <span class="o">*</span> <span class="n">TRIGGER_DEPTH</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;_event_time&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span> <span class="o">*</span> <span class="n">TRIGGER_DEPTH</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;_apply_delay&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span> <span class="o">*</span> <span class="n">TRIGGER_DEPTH</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">single</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">point_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">point_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">point_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">LEIAStructure</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span> <span class="n">single</span><span class="o">=</span><span class="n">single</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">point_list</span> <span class="o">=</span> <span class="n">point_list</span>
+
+    <span class="k">def</span> <span class="nf">_translate_point_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point_list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point_list</span><span class="p">,</span> <span class="n">Triggers</span><span class="p">):</span>
+            <span class="n">point_list</span> <span class="o">=</span> <span class="n">point_list</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">point</span><span class="p">:</span> <span class="n">TriggerPoints</span><span class="p">(</span><span class="n">point</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">point_list</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;TriggerStrategy(single=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">single</span><span class="si">}</span><span class="s2">, delay=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="si">}</span><span class="s2">, point_list=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">point_list</span><span class="si">}</span><span class="s2">, point_list_trigged=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">point_list_trigged</span><span class="si">}</span><span class="s2">, cnt_list_trigged=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cnt_list_trigged</span><span class="si">}</span><span class="s2">, event_time=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_time_list</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">point_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_point_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">)[</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">Triggers</span><span class="p">(</span><span class="n">_point_list</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">TriggerPoints</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">_point_list</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">r</span>
+
+    <span class="nd">@point_list</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">point_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate_point_list</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;data should be a list&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Size of data too high&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">point_list_trigged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_point_list_trigged</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list_trigged</span><span class="p">)[</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">Triggers</span><span class="p">(</span><span class="n">_point_list_trigged</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">TriggerPoints</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">_point_list_trigged</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">r</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cnt_list_trigged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_cnt_list_trigged</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cnt_trigged</span><span class="p">)[</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">_cnt_list_trigged</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">event_time_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_event_time_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_event_time</span><span class="p">)[</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">_event_time_list</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">SetTriggerStrategy</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;strategy&quot;</span><span class="p">,</span> <span class="n">TriggerStrategy</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;SetTriggerStrategy(index=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s2">, strategy=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+
+<div class="viewcode-block" id="ATR"><a class="viewcode-back" href="../api.html#smartleia.ATR">[docs]</a><span class="k">class</span> <span class="nc">ATR</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class is used to represent an ATR.</span>
+
+<span class="sd">       Attributes:</span>
+<span class="sd">           ts (ctypes.c_uint8): Description of `attr1`.</span>
+<span class="sd">           t0 (ctypes.c_uint8): Description of `attr2`.</span>
+<span class="sd">           ta (ctypes.c_uint8[4]): Description of `attr1`.</span>
+<span class="sd">           tb (ctypes.c_uint8[4]): Description of `attr2`.</span>
+<span class="sd">           tc (ctypes.c_uint8[4]): Description of `attr1`.</span>
+<span class="sd">           td (ctypes.c_uint8[4]): Description of `attr2`.</span>
+<span class="sd">           h (ctypes.c_uint8[16]): Description of `attr1`.</span>
+<span class="sd">           t_mask (ctypes.c_uint8[4]): Description of `attr2`.</span>
+<span class="sd">           h_num (ctypes.c_uint8): Description of `attr1`.</span>
+<span class="sd">           tck (ctypes.c_uint8): Description of `attr2`.</span>
+<span class="sd">           tck_present (ctypes.c_uint8): Description of `attr1`.</span>
+<span class="sd">           D_i_curr (ctypes.c_uint32): Description of `attr2`.</span>
+<span class="sd">           F_i_curr (ctypes.c_uint32): Description of `attr1`.</span>
+<span class="sd">           f_max_curr (ctypes.c_uint32): Description of `attr2`.</span>
+<span class="sd">           T_protocol_curr (ctypes.c_uint8): Description of `attr1`.</span>
+<span class="sd">           ifsc (ctypes.c_uint8): Description of `attr2`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;ts&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;t0&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;ta&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;tb&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;tc&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;td&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span> <span class="o">*</span> <span class="mi">16</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;t_mask&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;h_num&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;tck&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;tck_present&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;D_i_curr&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;F_i_curr&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;f_max_curr&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;T_protocol_curr&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;ifsc&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">normalized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+        <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">ATR</span><span class="o">.</span><span class="n">ts</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">ATR</span><span class="o">.</span><span class="n">t0</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">ATR</span><span class="o">.</span><span class="n">ta</span><span class="o">.</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">ATR</span><span class="o">.</span><span class="n">tb</span><span class="o">.</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">ATR</span><span class="o">.</span><span class="n">tc</span><span class="o">.</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">ATR</span><span class="o">.</span><span class="n">td</span><span class="o">.</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">ATR</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_num</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tck_present</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">ATR</span><span class="o">.</span><span class="n">tck</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">b</span>
+
+    <span class="k">def</span> <span class="nf">pretty_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TS = 0x</span><span class="si">%02x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;T0 = 0x</span><span class="si">%02x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TA[</span><span class="si">%d</span><span class="s2">] = 0x</span><span class="si">%02x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ta</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TB[</span><span class="si">%d</span><span class="s2">] = 0x</span><span class="si">%02x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tb</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TC[</span><span class="si">%d</span><span class="s2">] = 0x</span><span class="si">%02x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tc</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TD[</span><span class="si">%d</span><span class="s2">] = 0x</span><span class="si">%02x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">td</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_num</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;H[</span><span class="si">%d</span><span class="s2">] = 0x</span><span class="si">%02x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tck_present</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TCK =  0x</span><span class="si">%02x</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tck</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;------ Protocol information&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Current protocol T = </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T_protocol_curr</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;  Di = </span><span class="si">%d</span><span class="s2">, Fi = </span><span class="si">%d</span><span class="s2">, f_max_curr = </span><span class="si">%d</span><span class="s2"> MHz&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">D_i_curr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">F_i_curr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max_curr</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  IFSC = </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ifsc</span><span class="p">))</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;ATR(</span>
+<span class="s2">    ts=0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">    t0=0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t0</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">    ta=[0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ta</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ta</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">],</span>
+<span class="s2">    tb=[0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tb</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tb</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">],</span>
+<span class="s2">    tc=[0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tc</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">],</span>
+<span class="s2">    td=[0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">td</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">td</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">td</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">td</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">],</span>
+<span class="s2">    h=[0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">3</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">       0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">4</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">5</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">6</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">7</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">       0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">8</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span> <span class="mi">9</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">       0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">],</span>
+<span class="s2">    t_mask=[0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, 0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t_mask</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">],</span>
+<span class="s2">    h_num=0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">h_num</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">    tck=0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tck</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">    tck_present=0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tck_present</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">    D_i_curr=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">D_i_curr</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">    F_i_curr=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">F_i_curr</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">    f_max_curr=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">f_max_curr</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">    T_protocol_curr=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">T_protocol_curr</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">    ifsc=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ifsc</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">)&quot;&quot;&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">ResponseSizeStruct</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">            response_size (ctypes.c_uint32): number of bytes of the response.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;response_size&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">)]</span>
+
+
+<div class="viewcode-block" id="APDU"><a class="viewcode-back" href="../api.html#smartleia.APDU">[docs]</a><span class="k">class</span> <span class="nc">APDU</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Object for representing an APDU.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        cla (ctypes.c_uint8): the `CLA` field of the APDU.</span>
+<span class="sd">        ins (ctypes.c_uint8): the `INS` field of the APDU.</span>
+<span class="sd">        p1 (ctypes.c_uint8): the `P1` field of the APDU.</span>
+<span class="sd">        p2 (ctypes.c_uint8): the `P2` field of the APDU.</span>
+<span class="sd">        lc (ctypes.c_uint16): the `Lc` field of the APDU.</span>
+<span class="sd">        le (ctypes.c_uint32): the `Le` field of the APDU.</span>
+<span class="sd">        send_le (ctypes.c_uint8): Description of `attr1`.</span>
+<span class="sd">        data (list[int]): the `data` field of the APDU.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;cla&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;ins&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;p1&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;p2&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;lc&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint16</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;le&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;send_le&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;_data&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span> <span class="o">*</span> <span class="n">MAX_APDU_PAYLOAD_SIZE</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cla</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">ins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">p1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">p2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">lc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">le</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">send_le</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an APDU structure.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            cla: the `CLA` field of the APDU.</span>
+<span class="sd">            ins: the `INS` field of the APDU.</span>
+<span class="sd">            p1: the `P1` field of the APDU.</span>
+<span class="sd">            p2: the `P2` field of the APDU.</span>
+<span class="sd">            lc: the `Lc` (data length) field of the APDU.</span>
+<span class="sd">            le: the `Le` (expected length) field of the APDU.</span>
+<span class="sd">            send_le: TODO.</span>
+<span class="sd">            data: the list of bytes to send.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">lc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">LEIAStructure</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">cla</span><span class="o">=</span><span class="n">cla</span><span class="p">,</span> <span class="n">ins</span><span class="o">=</span><span class="n">ins</span><span class="p">,</span> <span class="n">p1</span><span class="o">=</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="o">=</span><span class="n">p2</span><span class="p">,</span> <span class="n">lc</span><span class="o">=</span><span class="n">lc</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="n">le</span><span class="p">,</span> <span class="n">send_le</span><span class="o">=</span><span class="n">send_le</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">LEIAStructure</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">)[:</span> <span class="n">APDU</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">offset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;APDU(cla=</span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cla</span><span class="p">)</span><span class="si">}</span><span class="s2">, ins=</span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ins</span><span class="p">)</span><span class="si">}</span><span class="s2">, p1=</span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span><span class="si">}</span><span class="s2">, p2=</span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span><span class="si">}</span><span class="s2">, lc=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="si">}</span><span class="s2">, le=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">le</span><span class="si">}</span><span class="s2">, send_le=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">send_le</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;, data=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)[</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="p">]</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;data should be a list&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Size of data too high&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">normalized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+        <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">APDU</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">APDU</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">APDU</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">APDU</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_le</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">APDU</span><span class="o">.</span><span class="n">le</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">APDU</span><span class="o">.</span><span class="n">le</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_le</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">APDU</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">APDU</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">b</span></div>
+
+
+<div class="viewcode-block" id="create_APDU_from_bytes"><a class="viewcode-back" href="../api.html#smartleia.create_APDU_from_bytes">[docs]</a><span class="k">def</span> <span class="nf">create_APDU_from_bytes</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">APDU</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Create an :class:`APDU` instance from a list of bytes.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; create_APDU_from_bytes([0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09])</span>
+<span class="sd">        APDU(cla=0x00, ins=0x01, p1=0x02, p2=0x03, lc=0x04, data=[0x05, 0x06, 0x07, 0x08], le=0x09, send_le=1)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">apdu</span> <span class="o">=</span> <span class="n">APDU</span><span class="p">()</span>
+    <span class="n">apdu</span><span class="o">.</span><span class="n">cla</span><span class="p">,</span> <span class="n">apdu</span><span class="o">.</span><span class="n">ins</span><span class="p">,</span> <span class="n">apdu</span><span class="o">.</span><span class="n">p1</span><span class="p">,</span> <span class="n">apdu</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">_bytes</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">apdu</span><span class="o">.</span><span class="n">send_le</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;Error in decoding APDU buffer of size </span><span class="si">%d</span><span class="s2"> is too small&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">))</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span><span class="p">,</span> <span class="n">apdu</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">apdu</span><span class="o">.</span><span class="n">send_le</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span><span class="p">,</span> <span class="n">apdu</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="n">_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">==</span> <span class="mh">0x00</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="c1"># This is an extended APDU, try to decode Lc on 16 bits</span>
+            <span class="n">apdu</span><span class="o">.</span><span class="n">send_le</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">=</span> <span class="p">(</span><span class="n">_bytes</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">+</span> <span class="n">_bytes</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+            <span class="c1"># Get the data</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">+</span> <span class="mi">7</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">apdu</span><span class="o">.</span><span class="n">_data</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                        <span class="s2">&quot;Error in decoding extended APDU: buffer </span><span class="si">%d</span><span class="s2"> exceeds LEIA size </span><span class="si">%d</span><span class="s2">&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">apdu</span><span class="o">.</span><span class="n">lc</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">apdu</span><span class="o">.</span><span class="n">_data</span><span class="p">))</span>
+                    <span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">apdu</span><span class="o">.</span><span class="n">lc</span><span class="p">):</span>
+                    <span class="n">apdu</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_bytes</span><span class="p">[</span><span class="mi">7</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>
+                <span class="c1"># Get Le if present</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">+</span> <span class="mi">7</span> <span class="o">+</span> <span class="mi">3</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">_bytes</span><span class="p">[</span><span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">+</span> <span class="mi">7</span><span class="p">]</span> <span class="o">!=</span> <span class="mh">0x00</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Error in decoding extended APDU Le&quot;</span><span class="p">)</span>
+                    <span class="n">apdu</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="p">(</span><span class="n">_bytes</span><span class="p">[</span><span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">+</span> <span class="mi">7</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">+</span> <span class="n">_bytes</span><span class="p">[</span><span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">+</span> <span class="mi">7</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Lc is not present and we have in fact Le on 3 bytes</span>
+                <span class="n">apdu</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span>
+                <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Short APDU with no data</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+                <span class="n">apdu</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="n">_bytes</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+                <span class="n">apdu</span><span class="o">.</span><span class="n">send_le</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Should be covered otherwise</span>
+                <span class="n">apdu</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">apdu</span><span class="o">.</span><span class="n">send_le</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Short APDU with data</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">apdu</span><span class="o">.</span><span class="n">lc</span><span class="p">):</span>
+                <span class="n">apdu</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_bytes</span><span class="p">[</span><span class="mi">5</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">apdu</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="n">_bytes</span><span class="p">[</span><span class="mi">5</span> <span class="o">+</span> <span class="n">apdu</span><span class="o">.</span><span class="n">lc</span><span class="p">]</span>
+                    <span class="n">apdu</span><span class="o">.</span><span class="n">send_le</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">apdu</span></div>
+
+
+<div class="viewcode-block" id="RESP"><a class="viewcode-back" href="../api.html#smartleia.RESP">[docs]</a><span class="k">class</span> <span class="nc">RESP</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class is used to represent an RESP.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        sw1 (ctypes.c_uint8): The value of `SW1` field.</span>
+<span class="sd">        sw2 (ctypes.c_uint8): The value of `SW2` field.</span>
+<span class="sd">        le (ctypes.c_uint32): The length of the data.</span>
+<span class="sd">        data (list[byte]): The value of the `data` field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;le&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;sw1&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;sw2&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;delta_t&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;delta_t_answer&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;_data&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span> <span class="o">*</span> <span class="n">MAX_APDU_PAYLOAD_SIZE</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sw1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sw2</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delta_t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delta_t_answer</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an RESP structure.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            le (int): the `Le` field of the RESP.</span>
+<span class="sd">            sw1 (int): the `SW1` field of the RESP.</span>
+<span class="sd">            sw2 (int): the `SW2` field of the RESP.</span>
+<span class="sd">            delta_t (int) : total time for the APDU.</span>
+<span class="sd">            delta_t_answer (int) : answer time for the APDU.</span>
+<span class="sd">            data (list[int]): the list of bytes received.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">LEIAStructure</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">sw1</span><span class="o">=</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="o">=</span><span class="n">sw2</span><span class="p">,</span> <span class="n">delta_t</span><span class="o">=</span><span class="n">delta_t</span><span class="p">,</span> <span class="n">delta_t_answer</span><span class="o">=</span><span class="n">delta_t_answer</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;RESP(sw1=0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sw1</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, sw2=0x</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sw2</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">, le=</span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">le</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;, data=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">le</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;)</span><span class="se">\n</span><span class="s2">delta_t=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_t</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> microseconds, delta_t_answer=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_t_answer</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> microseconds&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)[</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">le</span><span class="p">]</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;data should be a list&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Size of data too high&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">normalized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+        <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">RESP</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">le</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">RESP</span><span class="o">.</span><span class="n">sw1</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">RESP</span><span class="o">.</span><span class="n">sw1</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">+=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">addressof</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">RESP</span><span class="o">.</span><span class="n">sw2</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">RESP</span><span class="o">.</span><span class="n">sw2</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">b</span></div>
+
+
+<div class="viewcode-block" id="T"><a class="viewcode-back" href="../api.html#smartleia.T">[docs]</a><span class="k">class</span> <span class="nc">T</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ISO7816 protocol selection.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: The protocol is negotiated.</span>
+    <span class="n">AUTO</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="c1">#: The protocol is T=0</span>
+    <span class="n">T0</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1">#: The protocol is T=1</span>
+    <span class="n">T1</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+<span class="k">class</span> <span class="nc">Mode</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ISO7816 mode selection.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+   
+    <span class="c1"># USART mode</span>
+    <span class="n">USART</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Bitbang mode</span>
+    <span class="n">BITBANG</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="k">class</span> <span class="nc">LEIAMode</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;mode&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">LEIAStructure</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ConfigureSmartcardCommand</span><span class="p">(</span><span class="n">LEIAStructure</span><span class="p">):</span>
+    <span class="n">_pack_</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;protocol&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;etu&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;freq&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;negotiate_pts&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;negotiate_baudrate&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint8</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">protocol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">etu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">negotiate_pts</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">negotiate_baudrate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">LEIAStructure</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">protocol</span><span class="o">=</span><span class="n">protocol</span><span class="p">,</span>
+            <span class="n">etu</span><span class="o">=</span><span class="n">etu</span><span class="p">,</span>
+            <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+            <span class="n">negotiate_pts</span><span class="o">=</span><span class="n">negotiate_pts</span><span class="p">,</span>
+            <span class="n">negotiate_baudrate</span><span class="o">=</span><span class="n">negotiate_baudrate</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="LEIA"><a class="viewcode-back" href="../api.html#smartleia.LEIA">[docs]</a><span class="k">class</span> <span class="nc">LEIA</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class connects to a LEIA board and provides an access to all the device functionnality.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">USB_VID</span> <span class="o">=</span> <span class="mh">0x3483</span>
+    <span class="n">USB_PID</span> <span class="o">=</span> <span class="mh">0x0BB9</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">serial_factory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">auto_open</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            device: the serial port to use with LEIA (like /dev/ttyUSB0).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: if no serial port is provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reconfigured</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_stop</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_relay_thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curr_atr</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">serial_factory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">serial_factory</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_factory</span> <span class="o">=</span> <span class="n">serial_factory</span>
+
+        <span class="k">if</span> <span class="n">auto_open</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_testWaitingFlag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify the presence of the waiting flag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read_all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read_all</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">d</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">87</span><span class="p">:</span>  <span class="c1"># b&quot;W&quot;</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="s2">&quot;Can not connect to LEIA.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_checkAck</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify the presence of the acknowledge flag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;R&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;No response ack received.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_checkStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify the presence of the status flag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="n">s</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;w&quot;</span><span class="p">:</span>
+            <span class="c1"># This is a &#39;wait extension&#39; flag, try to read again</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;No status flag received.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;U&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;LEIA firmware do not handle this command.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;E&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Unkwown error (E).&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;S&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid status flag &#39;</span><span class="si">{s}</span><span class="s2">&#39; received.&quot;</span><span class="p">)</span>
+
+        <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Status not received.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">status</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">ERR_FLAGS</span><span class="p">[</span><span class="nb">ord</span><span class="p">(</span><span class="n">status</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">status</span>
+
+    <span class="k">def</span> <span class="nf">_read_response_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read and parse the &quot;response size&quot; field.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">ResponseSizeStruct</span><span class="p">()</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">RESPONSE_LEN_SIZE</span><span class="p">))</span><span class="o">.</span><span class="n">response_size</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="LEIA.reset"><a class="viewcode-back" href="../api.html#smartleia.LEIA.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reset LEIA.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_testWaitingFlag</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;r&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LEIA.open"><a class="viewcode-back" href="../api.html#smartleia.LEIA.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Open LEIA.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
+            <span class="c1"># Try to find automatically the device</span>
+            <span class="n">possible_ports</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">serial</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">list_ports</span><span class="o">.</span><span class="n">comports</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">port</span><span class="o">.</span><span class="n">pid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">USB_PID</span> <span class="ow">and</span> <span class="n">port</span><span class="o">.</span><span class="n">vid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">USB_VID</span><span class="p">:</span>
+                    <span class="n">possible_ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_ports</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Too much </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">USB_VID</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">USB_PID</span><span class="si">}</span><span class="s2"> devices found! I don&#39;t know which one to use.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_ports</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">USB_VID</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">USB_PID</span><span class="si">}</span><span class="s2"> device found&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">possible_port</span> <span class="ow">in</span> <span class="n">possible_ports</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">possible_port</span><span class="o">.</span><span class="n">device</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_factory</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">115200</span>
+                    <span class="p">)</span>
+
+                    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_all</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">break</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_testWaitingFlag</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">10</span>
+                <span class="k">except</span> <span class="ne">ConnectionError</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_factory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">115200</span><span class="p">)</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_all</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_testWaitingFlag</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">10</span></div>
+
+    <span class="c1"># Set the mode to either USART or BITBANG</span>
+    <span class="k">def</span> <span class="nf">set_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Mode</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">USART</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="n">LEIAMode</span><span class="p">(</span><span class="n">Mode</span><span class="o">.</span><span class="n">USART</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">Mode</span><span class="o">.</span><span class="n">BITBANG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="n">LEIAMode</span><span class="p">(</span><span class="n">Mode</span><span class="o">.</span><span class="n">BITBANG</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid mode for &#39;set_mode&#39; (e) command.&quot;</span>
+            <span class="p">)</span>
+        
+    <span class="c1"># Get the current mode</span>
+    <span class="k">def</span> <span class="nf">get_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;g&quot;</span><span class="p">)</span>
+        <span class="n">r_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_response_size</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">r_size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid response size for &#39;get_mode&#39; (g) command.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="n">Mode</span><span class="o">.</span><span class="n">USART</span>
+        <span class="k">elif</span> <span class="n">r</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01</span><span class="s2">&quot;</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="n">Mode</span><span class="o">.</span><span class="n">BITBANG</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">mode</span>
+
+<div class="viewcode-block" id="LEIA.configure_smartcard"><a class="viewcode-back" href="../api.html#smartleia.LEIA.configure_smartcard">[docs]</a>    <span class="k">def</span> <span class="nf">configure_smartcard</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">protocol_to_use</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ETU_to_use</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">freq_to_use</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">negotiate_pts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">negotiate_baudrate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure a smartcard connection.</span>
+
+<span class="sd">        Method to configure a smartcard.</span>
+<span class="sd">        By default, the smartcard reader will negociate with the smartcard the mode (T=0 or T=1), the ETU and</span>
+<span class="sd">        the frequence to use.</span>
+<span class="sd">        It is possible to:</span>
+
+<span class="sd">        - force a mode (by setting protocol_to_use to 0 for T=0, and to 1 for T=1)</span>
+<span class="sd">        - force an ETU (by setting the ETU_to_use parameter)</span>
+<span class="sd">        - force a frequence (by setting the freq_to_use parameter)</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; leia.configure_smartcard(T.T0, ETU_to_use=372)</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            protocol_to_use: The protocol to use (0: T=0, 1: T=1).</span>
+<span class="sd">            ETU_to_use: The ETU value to force. If None, will be negociated (or default will be used).</span>
+<span class="sd">            freq_to_use: The ISO7816 clock frequency to use. If None, will be negociated (or default will be used).</span>
+<span class="sd">            negotiate_pts: if LEIA can try to negotiate the PTS.</span>
+<span class="sd">            negotiate_baudrate: if LEIA can negotiate the baudrate. There is not impact if `ETU_to_use` and `freq_to_use` are set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_testWaitingFlag</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">reconfigured</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">curr_atr</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">protocol_to_use</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">protocol_to_use</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">AUTO</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_protocol_to_use</span> <span class="o">=</span> <span class="n">T</span><span class="p">(</span><span class="n">protocol_to_use</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unknown protocol value.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">ETU_to_use</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ETU_to_use</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="n">freq_to_use</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">freq_to_use</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">negotiate_pts</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">negotiate_pts</span> <span class="k">else</span> <span class="kc">False</span>
+            <span class="n">negotiate_baudrate</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">negotiate_baudrate</span> <span class="k">else</span> <span class="kc">False</span>
+
+            <span class="c1"># We always try to negotiate a T=1 communication if not specifically asked otherwise</span>
+            <span class="c1"># Fallback to auto if this is not possible!</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">protocol_to_use</span> <span class="o">==</span> <span class="n">T</span><span class="o">.</span><span class="n">AUTO</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">negotiate_pts</span> <span class="o">==</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">struct</span> <span class="o">=</span> <span class="n">ConfigureSmartcardCommand</span><span class="p">(</span>
+                        <span class="n">T</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">T1</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="n">ETU_to_use</span><span class="p">,</span>
+                        <span class="n">freq_to_use</span><span class="p">,</span>
+                        <span class="n">negotiate_pts</span><span class="p">,</span>
+                        <span class="n">negotiate_baudrate</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="n">struct</span> <span class="o">=</span> <span class="n">ConfigureSmartcardCommand</span><span class="p">(</span>
+                        <span class="n">T</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">AUTO</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="n">ETU_to_use</span><span class="p">,</span>
+                        <span class="n">freq_to_use</span><span class="p">,</span>
+                        <span class="n">negotiate_pts</span><span class="p">,</span>
+                        <span class="n">negotiate_baudrate</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">struct</span> <span class="o">=</span> <span class="n">ConfigureSmartcardCommand</span><span class="p">(</span>
+                    <span class="n">_protocol_to_use</span><span class="p">,</span>
+                    <span class="n">ETU_to_use</span><span class="p">,</span>
+                    <span class="n">freq_to_use</span><span class="p">,</span>
+                    <span class="n">negotiate_pts</span><span class="p">,</span>
+                    <span class="n">negotiate_baudrate</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LEIA.get_trigger_strategy"><a class="viewcode-back" href="../api.html#smartleia.LEIA.get_trigger_strategy">[docs]</a>    <span class="k">def</span> <span class="nf">get_trigger_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SID</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TriggerStrategy</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the strategy N°SID.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            SID: The trigger strategy&#39;s ID to get.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            TriggerStrategy: The trigger strategy N°SID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">SID</span> <span class="o">&gt;=</span> <span class="n">STRATEGY_MAX</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;get_trigger_strategy: asked SID=</span><span class="si">%d</span><span class="s2"> exceeds STRATEGY_MAX=</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">SID</span><span class="p">,</span> <span class="n">STRATEGY_MAX</span><span class="p">))</span>
+           
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">ByteStruct</span><span class="p">(</span><span class="n">SID</span><span class="p">))</span>
+
+            <span class="n">r_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_response_size</span><span class="p">()</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">TriggerStrategy</span><span class="p">(</span><span class="n">TRIGGER_DEPTH</span><span class="p">)</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">r_size</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="LEIA.set_trigger_strategy"><a class="viewcode-back" href="../api.html#smartleia.LEIA.set_trigger_strategy">[docs]</a>    <span class="k">def</span> <span class="nf">set_trigger_strategy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">SID</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">point_list</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">delay</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">single</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set and activate a trigger strategy.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            SID: the strategy bank ID to use.</span>
+<span class="sd">            point_list: the sequence to match for the trigger.</span>
+<span class="sd">            delay: the delay (in milliseconds) between the moment of the detection and the moment where the trigger is actually set high.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">SID</span> <span class="o">&gt;=</span> <span class="n">STRATEGY_MAX</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;get_trigger_strategy: asked SID=</span><span class="si">%d</span><span class="s2"> exceeds STRATEGY_MAX=</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">SID</span><span class="p">,</span> <span class="n">STRATEGY_MAX</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point_list</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">point_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">point_list</span><span class="p">]</span>
+
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">point_list</span><span class="p">)</span>
+
+            <span class="n">sts</span> <span class="o">=</span> <span class="n">SetTriggerStrategy</span><span class="p">(</span><span class="n">SID</span><span class="p">,</span> <span class="n">TriggerStrategy</span><span class="p">(</span><span class="n">delay</span> <span class="o">=</span> <span class="n">delay</span><span class="p">,</span> <span class="n">single</span> <span class="o">=</span> <span class="n">single</span><span class="p">,</span> <span class="n">point_list</span> <span class="o">=</span> <span class="n">point_list</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="n">sts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LEIA.get_timers"><a class="viewcode-back" href="../api.html#smartleia.LEIA.get_timers">[docs]</a>    <span class="k">def</span> <span class="nf">get_timers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Timers</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the `timers` of the last command.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Timers: The `Timer` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+
+            <span class="n">r_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_response_size</span><span class="p">()</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">Timers</span><span class="p">()</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">r_size</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="LEIA.get_ATR"><a class="viewcode-back" href="../api.html#smartleia.LEIA.get_ATR">[docs]</a>    <span class="k">def</span> <span class="nf">get_ATR</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ATR</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the `ATR`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ATR: The `ATR` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
+
+            <span class="n">r_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_response_size</span><span class="p">()</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">ATR</span><span class="p">()</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">r_size</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="LEIA.is_card_inserted"><a class="viewcode-back" href="../api.html#smartleia.LEIA.is_card_inserted">[docs]</a>    <span class="k">def</span> <span class="nf">is_card_inserted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return `True` if a smartcard is inserted in LEIA.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            `True` if a smartcard is inserted, else `False`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;?&quot;</span><span class="p">)</span>
+
+            <span class="n">r_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_response_size</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">r_size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s2">&quot;Invalid response size for &#39;is_card_inserted&#39; (?) command.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01</span><span class="s2">&quot;</span> <span class="k">else</span> <span class="kc">False</span></div>
+
+    <span class="c1"># DFU mode</span>
+<div class="viewcode-block" id="LEIA.dfu"><a class="viewcode-back" href="../api.html#smartleia.LEIA.dfu">[docs]</a>    <span class="k">def</span> <span class="nf">dfu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reboot LEIA in DFU mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+    <span class="c1"># AVR flasher mode</span>
+<div class="viewcode-block" id="LEIA.flasher"><a class="viewcode-back" href="../api.html#smartleia.LEIA.flasher">[docs]</a>    <span class="k">def</span> <span class="nf">flasher</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reboot LEIA in funcard flasher mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;f&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+ 
+<div class="viewcode-block" id="LEIA.smartreader"><a class="viewcode-back" href="../api.html#smartleia.LEIA.smartreader">[docs]</a>    <span class="k">def</span> <span class="nf">smartreader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reboot LEIA in funcard smartreader mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="LEIA.send_APDU"><a class="viewcode-back" href="../api.html#smartleia.LEIA.send_APDU">[docs]</a>    <span class="k">def</span> <span class="nf">send_APDU</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">apdu</span><span class="p">:</span> <span class="n">APDU</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RESP</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send an `APDU`.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            apdu: The `APDU` object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RESP: The `RESP` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_command</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">apdu</span><span class="p">)</span>
+
+            <span class="n">r_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_response_size</span><span class="p">()</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">RESP</span><span class="p">()</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">r_size</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">r</span></div>
+
+    <span class="k">def</span> <span class="nf">_send_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">struct</span><span class="p">:</span> <span class="n">LEIAStructure</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a command to LEIA.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            command: the ID of the command.</span>
+<span class="sd">            struct: the data of the command.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_testWaitingFlag</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">struct</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">compacted</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">compacted</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">COMMAND_LEN_SIZE</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="s2">&quot;big&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">compacted</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">COMMAND_LEN_SIZE</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="s2">&quot;big&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkStatus</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkAck</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no attribute &#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Handle connection with a virtual smart card reader</span>
+    <span class="c1"># on localhost or elsewhere on the network</span>
+    <span class="k">def</span> <span class="nf">_pcsc_relay_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>  <span class="c1"># noqa: C901</span>
+        <span class="kn">import</span> <span class="nn">binascii</span>
+        <span class="kn">import</span> <span class="nn">socket</span>
+        <span class="kn">import</span> <span class="nn">struct</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting LEIA PCSC relay for host </span><span class="si">%s</span><span class="s2">:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_stop</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_card_inserted</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">curr_atr</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;Error: cannot connect to </span><span class="si">%s</span><span class="s2">:</span><span class="si">%d</span><span class="s2">. Is PCSCD running with virtual smartcard readers?&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+            <span class="n">s</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+            <span class="k">while</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_card_inserted</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconfigured</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_stop</span>
+            <span class="p">):</span>
+                <span class="c1"># Now wait for data to come</span>
+                <span class="c1"># Get the comrand</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+                <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_stop</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">data</span> <span class="o">+=</span> <span class="n">s</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+                        <span class="k">pass</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_stop</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="n">length</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;!H&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># We received a Power Off, Power On, Reset or Get ATR command</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">:</span>
+                        <span class="c1"># print(&quot;Received Power Off command!&quot;)</span>
+                        <span class="k">pass</span>
+                    <span class="k">elif</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x01</span><span class="s2">&quot;</span><span class="p">:</span>
+                        <span class="c1"># print(&quot;Received Power On command!&quot;)</span>
+                        <span class="k">pass</span>
+                    <span class="k">elif</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x02</span><span class="s2">&quot;</span><span class="p">:</span>
+                        <span class="c1"># print(&quot;Received Reset command!&quot;)</span>
+                        <span class="k">pass</span>
+                    <span class="k">elif</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x04</span><span class="s2">&quot;</span><span class="p">:</span>
+                        <span class="c1"># print(&quot;Received Get ATR command!&quot;)</span>
+                        <span class="c1"># Format our length</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_card_inserted</span><span class="p">():</span>
+                            <span class="c1"># print(&quot;Card not inserted!&quot;)</span>
+                            <span class="n">s</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00\x00</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_atr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">curr_atr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ATR</span><span class="p">()</span>
+
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_atr</span><span class="o">.</span><span class="n">ts</span> <span class="o">==</span> <span class="mh">0x00</span><span class="p">:</span>
+                                <span class="c1"># Card not configured, configure it</span>
+                                <span class="k">try</span><span class="p">:</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">configure_smartcard</span><span class="p">()</span>
+                                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                                    <span class="k">pass</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">curr_atr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ATR</span><span class="p">()</span>
+                            <span class="c1"># Send the ATR</span>
+                            <span class="n">length</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;!H&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">curr_atr</span><span class="o">.</span><span class="n">normalized</span><span class="p">()))</span>
+                            <span class="n">s</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">length</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_atr</span><span class="o">.</span><span class="n">normalized</span><span class="p">())</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="s2">&quot;LEIA PCSC relay error: received unknown command </span><span class="si">%s</span><span class="s2">&quot;</span>
+                            <span class="o">%</span> <span class="n">binascii</span><span class="o">.</span><span class="n">hexlify</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># We received an APDU</span>
+                    <span class="c1"># print(&quot;Received APDU command of size %d!&quot; % length)</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+                    <span class="c1"># Format and send the APDU</span>
+                    <span class="n">apdu</span> <span class="o">=</span> <span class="n">create_APDU_from_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_APDU</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+                    <span class="c1"># If we have a 61XX response, handle the GET_RESPONSE here!</span>
+                    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x61</span><span class="p">:</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_APDU</span><span class="p">(</span>
+                            <span class="n">APDU</span><span class="p">(</span>
+                                <span class="n">cla</span><span class="o">=</span><span class="n">apdu</span><span class="o">.</span><span class="n">cla</span><span class="p">,</span>
+                                <span class="n">ins</span><span class="o">=</span><span class="mh">0xC0</span><span class="p">,</span>
+                                <span class="n">p1</span><span class="o">=</span><span class="mh">0x00</span><span class="p">,</span>
+                                <span class="n">p2</span><span class="o">=</span><span class="mh">0x00</span><span class="p">,</span>
+                                <span class="n">le</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">sw2</span><span class="p">,</span>
+                                <span class="n">send_le</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="c1"># If we have a 6Cxx (wrong length), adapt the APDU</span>
+                    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x6C</span><span class="p">:</span>
+                        <span class="n">apdu</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">sw2</span>
+                        <span class="n">apdu</span><span class="o">.</span><span class="n">send_le</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_APDU</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+                    <span class="c1"># If we have 67XX, adapt the APDU</span>
+                    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x67</span><span class="p">:</span>
+                        <span class="n">apdu</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="mh">0x00</span>
+                        <span class="n">apdu</span><span class="o">.</span><span class="n">send_le</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_APDU</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+                    <span class="c1"># Format the response and send it</span>
+                    <span class="n">length</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;!H&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">normalized</span><span class="p">()))</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">length</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">normalized</span><span class="p">())</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reconfigured</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_stop</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;End of the relay.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">pcsc_relay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mh">0x8C7B</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_relay_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;LEIA PCSC relay&quot;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pcsc_relay_thread</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_relay_thread</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_relay_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">pcsc_relay_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcsc_stop</span> <span class="o">=</span> <span class="kc">True</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2019-2020, ANSSI.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
