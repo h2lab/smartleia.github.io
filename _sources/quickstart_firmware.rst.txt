@@ -16,8 +16,8 @@ The sources can be fetched from LEIA github :
 
 .. code:: bash
 
-   $ git clone git@github.com:cw-leia/cw-leia-standalone-firmware.git
-   $ cd cw-leia-standalone-firmware
+   $ git clone git@github.com:h2lab/leia-solo-firmware.git
+   $ cd leia-solo-firmware
 
 Compile the firmware
 ^^^^^^^^^^^^^^^^^^^^^^^^^

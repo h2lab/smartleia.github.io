@@ -19,7 +19,7 @@ Via Git or Download
 
 .. code:: bash
 
-    $ git clone https://github.com/cw-leia/smartleia
+    $ git clone https://github.com/h2lab/smartleia
     $ cd smartleia
     $ pip install .
 
