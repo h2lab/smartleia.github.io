@@ -213,7 +213,7 @@
 <img alt="_images/leia_solo_specs.png" src="_images/leia_solo_specs.png" />
 <div class="section" id="enabling-dfu-bootloader-and-flashing-the-firmware">
 <h3><span class="section-number">3.1.1.1. </span>Enabling DFU Bootloader and flashing the Firmware<a class="headerlink" href="#enabling-dfu-bootloader-and-flashing-the-firmware" title="Permalink to this headline">¶</a></h3>
-<p>The actual version of LEIA can be flashed using the USB connector.</p>
+<p>The actual version of LEIA can be flashed using the USB connector. To boot in DFU mode, set the Boot mode jumber in <cite>DFU</cite> mode instead of <cite>LEIA</cite> mode and reset the board.</p>
 </div>
 <div class="section" id="enumerating-usb-devices">
 <h3><span class="section-number">3.1.1.2. </span>Enumerating USB devices<a class="headerlink" href="#enumerating-usb-devices" title="Permalink to this headline">¶</a></h3>
@@ -253,6 +253,7 @@ Found DFU: [0483:df11] ver=2200, devnum=2, cfg=1, intf=0, path=&quot;20-2&quot;,
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ dfu-util -d <span class="m">0483</span>:df11 -a <span class="m">0</span> --dfuse-address<span class="o">=</span>0x08000000 -D build/firmware.bin
 </pre></div>
 </div>
+<p>When the firmware is uploaded, remember to set the boot mode jumber to the <cite>LEIA</cite> mode, otherwhise the board will reboot in DFU mode.</p>
 </div>
 <div class="section" id="flashing-and-debugging-leia-firmware-through-swd">
 <h3><span class="section-number">3.1.1.5. </span>Flashing and debugging LEIA Firmware through SWD<a class="headerlink" href="#flashing-and-debugging-leia-firmware-through-swd" title="Permalink to this headline">¶</a></h3>
