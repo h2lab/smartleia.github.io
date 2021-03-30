@@ -103,9 +103,9 @@
 <li class="toctree-l2"><a class="reference internal" href="quickstart_software.html">3.3. Software Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="hard.html">4. Hardware</a></li>
-<li class="toctree-l1"><a class="reference internal" href="c/test.html">5. Firmware</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">6. Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c/test.html">4. Firmware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">5. Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">6. Other tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="publi.html">7. Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">8. Roadmap</a></li>
 </ul>
@@ -208,7 +208,7 @@
 <p>To compile and to run the project, some dependencies need to be installed :</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>ARM cross-compilation toolchain</p></li>
+<li><p>ARM none-eabi cross-compilation toolchain</p></li>
 <li><p>make</p></li>
 </ul>
 </div></blockquote>
@@ -216,7 +216,7 @@
 <div class="section" id="fetch-the-firmware-sources">
 <h2><span class="section-number">3.2.2. </span>Fetch the firmware sources<a class="headerlink" href="#fetch-the-firmware-sources" title="Permalink to this headline">¶</a></h2>
 <p>The sources can be fetched from LEIA github :</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone git@github.com:h2lab/leia-solo-firmware.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/h2lab/leia-solo-firmware.git
 $ <span class="nb">cd</span> leia-solo-firmware
 </pre></div>
 </div>
@@ -225,7 +225,7 @@ $ <span class="nb">cd</span> leia-solo-firmware
 <h2><span class="section-number">3.2.3. </span>Compile the firmware<a class="headerlink" href="#compile-the-firmware" title="Permalink to this headline">¶</a></h2>
 <p>Once the dependencies are installed and the sources fetched, it is possible to build a firmware with the following
 commands :</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make firmware
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make
 </pre></div>
 </div>
 </div>

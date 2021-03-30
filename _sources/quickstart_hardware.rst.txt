@@ -3,17 +3,15 @@
 Hardware Quickstart
 -------------------------
 
-PCB Version X
-^^^^^^^^^^^^^
+PCB Version 1.4
+^^^^^^^^^^^^^^^
+
+.. image:: imgs/leia_solo_specs.png
 
 Enabling DFU Bootloader and flashing the Firmware
 =================================================
 
-The actual version of LEIA can be flashed using the following wiring layout. This has been fixed in the new version that should be published soon.
-
-.. image:: imgs/dfu.png
-
-Then connect the USB cable to your workstation and open a terminal console.
+The actual version of LEIA can be flashed using the USB connector.
 
 Enumerating USB devices
 ========================
@@ -47,15 +45,27 @@ Enumerating DFU USB device alternate functions
 Flashing the LEIA Firwmare
 ==========================
 
-:: 
+You need the ``dfu-util`` tool, which should be packaged in most GNU/Linux distributions.
 
-     $ dfu-util -d 0483:df11 -a 0 --dfuse-address=0x08000000 -D build/firmware.bin
+From a previously built smartleia firmware directory (see :ref:`firmware_quickstart`),  use:
 
-If this is not working for you need to use and STLINK adapter connected to P593 (SWD READER)
+.. code:: bash
+
+   $ make dfu
+
+This command calls the dfu-util tool, which can also be executed manually:
 
 
-Flashing and debugging LEIA Firmware
-====================================
+.. code:: bash
+
+    $ dfu-util -d 0483:df11 -a 0 --dfuse-address=0x08000000 -D build/firmware.bin
+
+
+Flashing and debugging LEIA Firmware through SWD
+================================================
+
+DFU is not the only way to flash the firmware. A SWD interface allows firmware flashing through ``OpenOCD``. This interface can also be used
+for debugging.
 
 It is mandatory to connect an STLINK adapter to P593 (SWD READER) to enable debugging.
 
@@ -65,8 +75,4 @@ https://www.amazon.com/DAOKI-ST-Link-Programming-Emulator-Downloader/dp/B01EE4WA
 You can also use the STLINK that is shipped with some ST development boards like this one : 
 https://www.amazon.com/STM32F4DISCOVERY-STM32F407-Discovery-Evaluation-Development/dp/B00CW9AKDY/
 
-Since you are using the CW308-Board to interface the LEIA board to the chipwisperer you have to bridge P525. You also need to put some jumper according to the following picture :
-
-
-.. image:: imgs/mapping.png
 

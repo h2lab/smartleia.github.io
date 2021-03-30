@@ -1,7 +1,7 @@
 .. _api:
 
-API
----
+Python API
+----------
 
 .. automodule:: smartleia
     :members:

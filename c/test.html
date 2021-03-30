@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>5. Firmware Doc &mdash; LEIA 0.2.2 documentation</title>
+  <title>4. Firmware Doc &mdash; LEIA 0.2.2 documentation</title>
   
 
   
@@ -42,8 +42,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="6. API" href="../api.html" />
-    <link rel="prev" title="4. Hardware" href="../hard.html" /> 
+    <link rel="next" title="5. Python API" href="../api.html" />
+    <link rel="prev" title="3.3. Software Quickstart" href="../quickstart_software.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,14 +93,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../target.html">1. About the LEIA project</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">2. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">3. Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../hard.html">4. Hardware</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">5. Firmware</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#protocol">5.1. Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#timers">5.2. Timers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#triggers">5.3. Triggers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">4. Firmware</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#protocol">4.1. Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#timers">4.2. Timers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#triggers">4.3. Triggers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">6. Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">5. Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">6. Other tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../publi.html">7. Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../roadmap.html">8. Roadmap</a></li>
 </ul>
@@ -151,7 +151,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li><span class="section-number">5. </span>Firmware Doc</li>
+      <li><span class="section-number">4. </span>Firmware Doc</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -195,9 +195,9 @@
 }
 </style>
 <div class="section" id="firmware-doc">
-<span id="c-test"></span><h1><span class="section-number">5. </span>Firmware Doc<a class="headerlink" href="#firmware-doc" title="Permalink to this headline">¶</a></h1>
+<span id="c-test"></span><h1><span class="section-number">4. </span>Firmware Doc<a class="headerlink" href="#firmware-doc" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="protocol">
-<h2><span class="section-number">5.1. </span>Protocol<a class="headerlink" href="#protocol" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.1. </span>Protocol<a class="headerlink" href="#protocol" title="Permalink to this headline">¶</a></h2>
 <p>In order to communicate with LEIA, a simple communication protocol over uart is used. It allows to select a command, and execute it with specific data. The data produced by the command can finally be returned.</p>
 <p>Only one data buffer <code class="xref c c-type docutils literal notranslate"><span class="pre">command_cb_args_t</span></code> is used as the commands are executed one after the other in a sequential fashion. As there is no need to keep track of the result of the previous command, we can reuse the same buffer. The maximum size of our APDU payloads is 16384, and is mainly due to maximum buffers size in the MCU SRAM.</p>
 <dl class="c macro">
@@ -404,7 +404,7 @@
 
 </div>
 <div class="section" id="timers">
-<h2><span class="section-number">5.2. </span>Timers<a class="headerlink" href="#timers" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.2. </span>Timers<a class="headerlink" href="#timers" title="Permalink to this headline">¶</a></h2>
 <p>It is possible to get the timing of APDU commands (the time taken by the smart card
 to process the APDU command and send the response). We actually return two timers:
 <code class="docutils literal notranslate"><span class="pre">delta_t</span></code> and <code class="docutils literal notranslate"><span class="pre">delta_t_answer</span></code>. <code class="docutils literal notranslate"><span class="pre">delta_t</span></code> is the global time take by the response
@@ -415,7 +415,7 @@ first byte of the response).</p>
 zero values when timing such commands has no sense.</p>
 </div>
 <div class="section" id="triggers">
-<h2><span class="section-number">5.3. </span>Triggers<a class="headerlink" href="#triggers" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.3. </span>Triggers<a class="headerlink" href="#triggers" title="Permalink to this headline">¶</a></h2>
 <p>On LEIA, there is a triggers handling mode where a dedicated PIN is put high and
 then low on some events. Actually, two PINs are used for triggers: an internal trigger
 dedicated to the LEIA board, and a ChipWhisperer trigger on the 20-pins connector
@@ -528,8 +528,8 @@ has been triggered, and the <code class="xref c c-type docutils literal notransl
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../api.html" class="btn btn-neutral float-right" title="6. API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../hard.html" class="btn btn-neutral float-left" title="4. Hardware" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api.html" class="btn btn-neutral float-right" title="5. Python API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../quickstart_software.html" class="btn btn-neutral float-left" title="3.3. Software Quickstart" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>1. Target &mdash; LEIA 0.2.2 documentation</title>
+  <title>1. What is LEIA-Solo? &mdash; LEIA 0.2.2 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="2. Installation" href="installation.html" />
-    <link rel="prev" title="Welcome to LEIA’s documentation (last compiled: Mar 23, 2021)!" href="index.html" /> 
+    <link rel="prev" title="Welcome to LEIA’s documentation (last compiled: Mar 30, 2021)!" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,12 +90,16 @@
             
               <p class="caption"><span class="caption-text">Table of Contents</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">1. About the LEIA project</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. About the LEIA project</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#supported-features">1.1. Supported features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#open-source-and-open-hardware">1.2. Open-Source and Open-Hardware</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">2. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">3. Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hard.html">4. Hardware</a></li>
-<li class="toctree-l1"><a class="reference internal" href="c/test.html">5. Firmware</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">6. Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c/test.html">4. Firmware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">5. Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">6. Other tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="publi.html">7. Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">8. Roadmap</a></li>
 </ul>
@@ -146,7 +150,7 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li><span class="section-number">1. </span>Target</li>
+      <li><span class="section-number">1. </span>What is LEIA-Solo?</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -189,8 +193,62 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="target">
-<span id="id1"></span><h1><span class="section-number">1. </span>Target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-leia-solo">
+<span id="target"></span><h1><span class="section-number">1. </span>What is LEIA-Solo?<a class="headerlink" href="#what-is-leia-solo" title="Permalink to this headline">¶</a></h1>
+<p>LEIA-Solo is an open hardware and open source device targeting smart card side-channel analysis (SCA) and evaluation, for educational and evaluation purpose. It implements a fully controlled ISO7816 stack with a dedicated custom hardware platform to acquire clean measurements for SCA characterization.</p>
+<p>The LEIA-Solo board is made of two main parts: a STM32 MCU that contains the firmware handling the ISO7816-3 stack, and the ISO7816-3 connector that communicates with the target smart card (i.e. handling the physical connection) and is isolated with optocouplers for clean measurements. Having a fully controlled ISO7816 stack allows to position precise triggers at dedicated events (sending an APDU, receiving the response, etc.), which helps to get synchronized traces of smart card consumption activity (and then analyze and extract secrets using classical SCA techniques). Low-level access to the ISO7816-3 protocol also allows to explore interesting paths such as smart cards conformity checks and so on. With this versatility in mind, We have tried to make the implementation to cover as much as possible of the specification (T=0 and T=1, PTS negotiation, etc.).</p>
+<p>A big advantage of the LEIA-Solo board is also its software ecosystem: it is compatible with the ChipWhisperer SDK, and the board can be driven from a PC using an UART TTL or an USB connection with high level and easy to use Python library and scripts.</p>
+<div class="section" id="supported-features">
+<h2><span class="section-number">1.1. </span>Supported features<a class="headerlink" href="#supported-features" title="Permalink to this headline">¶</a></h2>
+<p>The LEIA-Solo board is versatile and supports multiple features:</p>
+<p><strong>Smartcard communication</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Hardware based ISO7816 stack supporting both ISO7816-3 T=0 and ISO7816-3 T=1</p></li>
+<li><p>BitBanged ISO7816 stack allowing to fully control the communication</p></li>
+<li><p>Timing measurement between ISO7816 transaction</p></li>
+<li><p>PTS negotiation (flexible ETU selection)</p></li>
+<li><p>ISO7816 clock frequency tuning</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Triggering</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Up to 4 trigger strategies, each one on 10 possible trigger events corresponding to classical ISO7816 elements (beginning of ATR, end of ATR, sending an APDU and receiving a response, etc.).</p></li>
+<li><p>The triggers also have a configurable delay, and support a ‘single’ mode.</p></li>
+<li><p>All the triggers states (number of observed triggers, etc.) can be recovered.</p></li>
+<li><p>Dedicated trigger pin in SOLO mode (standalone mode)</p></li>
+<li><p>ChipWhisperer triggering through the 20-pins standard interface</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Power analysis and glitching</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>USB-powered mode with octocouplers for more efficient measurements</p></li>
+<li><p>Direct power mode (external controled power supply not delivered)</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Smartcard reader mode</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Fully integrated with PC/SC, which allows to use LEIA-Solo as a classical smart card reader.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="open-source-and-open-hardware">
+<h2><span class="section-number">1.2. </span>Open-Source and Open-Hardware<a class="headerlink" href="#open-source-and-open-hardware" title="Permalink to this headline">¶</a></h2>
+<p>A big advantage of the LEIA-Solo board is also its software ecosystem: it is compatible with the NewAE Technology Inc. ChipWhisperer SDK,
+and the board can be driven from a PC an USB connection with high level and easy to use Python library and scripts.</p>
+<p>The LEIA-Solo project is fully Open-Source and Open-Hardware. All the software components aims to be published:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>LEIA-Solo firmware</p></li>
+<li><p>LEIA-Solo host-part tooling (python API, PC/SC backend support)</p></li>
+<li><p>ChipWhisperer SDK add-on</p></li>
+<li><p>Smart Card demonstration applet</p></li>
+</ul>
+</div></blockquote>
+</div>
 </div>
 
     <script type="text/javascript">
@@ -206,7 +264,7 @@
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="installation.html" class="btn btn-neutral float-right" title="2. Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to LEIA’s documentation (last compiled: Mar 23, 2021)!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to LEIA’s documentation (last compiled: Mar 30, 2021)!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

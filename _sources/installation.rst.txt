@@ -23,3 +23,12 @@ Via Git or Download
     $ cd smartleia
     $ pip install .
 
+Using the Debian package
+========================
+
+On Debian Bullseye and higher:
+
+.. code:: bash
+
+    $ sudo apt install smartleia python3-smartleia
+

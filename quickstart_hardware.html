@@ -94,12 +94,12 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">2. Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="quickstart.html">3. Quickstart</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">3.1. Hardware Quickstart</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pcb-version-x">3.1.1. PCB Version X</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pcb-version-1-4">3.1.1. PCB Version 1.4</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#enabling-dfu-bootloader-and-flashing-the-firmware">3.1.1.1. Enabling DFU Bootloader and flashing the Firmware</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#enumerating-usb-devices">3.1.1.2. Enumerating USB devices</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#enumerating-dfu-usb-device-alternate-functions">3.1.1.3. Enumerating DFU USB device alternate functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flashing-the-leia-firwmare">3.1.1.4. Flashing the LEIA Firwmare</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#flashing-and-debugging-leia-firmware">3.1.1.5. Flashing and debugging LEIA Firmware</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flashing-and-debugging-leia-firmware-through-swd">3.1.1.5. Flashing and debugging LEIA Firmware through SWD</a></li>
 </ul>
 </li>
 </ul>
@@ -108,9 +108,9 @@
 <li class="toctree-l2"><a class="reference internal" href="quickstart_software.html">3.3. Software Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="hard.html">4. Hardware</a></li>
-<li class="toctree-l1"><a class="reference internal" href="c/test.html">5. Firmware</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">6. Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c/test.html">4. Firmware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">5. Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">6. Other tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="publi.html">7. Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">8. Roadmap</a></li>
 </ul>
@@ -208,13 +208,12 @@
 </style>
 <div class="section" id="hardware-quickstart">
 <span id="id1"></span><h1><span class="section-number">3.1. </span>Hardware Quickstart<a class="headerlink" href="#hardware-quickstart" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="pcb-version-x">
-<h2><span class="section-number">3.1.1. </span>PCB Version X<a class="headerlink" href="#pcb-version-x" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pcb-version-1-4">
+<h2><span class="section-number">3.1.1. </span>PCB Version 1.4<a class="headerlink" href="#pcb-version-1-4" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/leia_solo_specs.png" src="_images/leia_solo_specs.png" />
 <div class="section" id="enabling-dfu-bootloader-and-flashing-the-firmware">
 <h3><span class="section-number">3.1.1.1. </span>Enabling DFU Bootloader and flashing the Firmware<a class="headerlink" href="#enabling-dfu-bootloader-and-flashing-the-firmware" title="Permalink to this headline">¶</a></h3>
-<p>The actual version of LEIA can be flashed using the following wiring layout. This has been fixed in the new version that should be published soon.</p>
-<img alt="_images/dfu.png" src="_images/dfu.png" />
-<p>Then connect the USB cable to your workstation and open a terminal console.</p>
+<p>The actual version of LEIA can be flashed using the USB connector.</p>
 </div>
 <div class="section" id="enumerating-usb-devices">
 <h3><span class="section-number">3.1.1.2. </span>Enumerating USB devices<a class="headerlink" href="#enumerating-usb-devices" title="Permalink to this headline">¶</a></h3>
@@ -245,20 +244,25 @@ Found DFU: [0483:df11] ver=2200, devnum=2, cfg=1, intf=0, path=&quot;20-2&quot;,
 </div>
 <div class="section" id="flashing-the-leia-firwmare">
 <h3><span class="section-number">3.1.1.4. </span>Flashing the LEIA Firwmare<a class="headerlink" href="#flashing-the-leia-firwmare" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ dfu-util -d 0483:df11 -a 0 --dfuse-address=0x08000000 -D build/firmware.bin
+<p>You need the <code class="docutils literal notranslate"><span class="pre">dfu-util</span></code> tool, which should be packaged in most GNU/Linux distributions.</p>
+<p>From a previously built smartleia firmware directory (see <a class="reference internal" href="quickstart_firmware.html#firmware-quickstart"><span class="std std-ref">Firmware Quickstart</span></a>),  use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make dfu
 </pre></div>
 </div>
-<p>If this is not working for you need to use and STLINK adapter connected to P593 (SWD READER)</p>
+<p>This command calls the dfu-util tool, which can also be executed manually:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ dfu-util -d <span class="m">0483</span>:df11 -a <span class="m">0</span> --dfuse-address<span class="o">=</span>0x08000000 -D build/firmware.bin
+</pre></div>
 </div>
-<div class="section" id="flashing-and-debugging-leia-firmware">
-<h3><span class="section-number">3.1.1.5. </span>Flashing and debugging LEIA Firmware<a class="headerlink" href="#flashing-and-debugging-leia-firmware" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="flashing-and-debugging-leia-firmware-through-swd">
+<h3><span class="section-number">3.1.1.5. </span>Flashing and debugging LEIA Firmware through SWD<a class="headerlink" href="#flashing-and-debugging-leia-firmware-through-swd" title="Permalink to this headline">¶</a></h3>
+<p>DFU is not the only way to flash the firmware. A SWD interface allows firmware flashing through <code class="docutils literal notranslate"><span class="pre">OpenOCD</span></code>. This interface can also be used
+for debugging.</p>
 <p>It is mandatory to connect an STLINK adapter to P593 (SWD READER) to enable debugging.</p>
 <p>If you do not have any STLINK adapter you can buy one here :
 <a class="reference external" href="https://www.amazon.com/DAOKI-ST-Link-Programming-Emulator-Downloader/dp/B01EE4WAC8/">https://www.amazon.com/DAOKI-ST-Link-Programming-Emulator-Downloader/dp/B01EE4WAC8/</a></p>
 <p>You can also use the STLINK that is shipped with some ST development boards like this one :
 <a class="reference external" href="https://www.amazon.com/STM32F4DISCOVERY-STM32F407-Discovery-Evaluation-Development/dp/B00CW9AKDY/">https://www.amazon.com/STM32F4DISCOVERY-STM32F407-Discovery-Evaluation-Development/dp/B00CW9AKDY/</a></p>
-<p>Since you are using the CW308-Board to interface the LEIA board to the chipwisperer you have to bridge P525. You also need to put some jumper according to the following picture :</p>
-<img alt="_images/mapping.png" src="_images/mapping.png" />
 </div>
 </div>
 </div>

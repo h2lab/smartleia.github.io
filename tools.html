@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>6. Demonstration and educational tools &mdash; LEIA 0.2.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="http://wavedrom.com/skins/default.js"></script>
+        <script src="http://wavedrom.com/wavedrom.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="7. Publications" href="publi.html" />
+    <link rel="prev" title="5. Python API" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> LEIA
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="target.html">1. About the LEIA project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">3. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c/test.html">4. Firmware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">5. Python API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">6. Other tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#smartleia-target-applet">6.1. Smartleia target applet</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#purpose-of-the-applet">6.1.1. Purpose of the applet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compilation">6.1.2. Compilation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pushing-the-applet">6.1.3. Pushing the applet</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#funcard-demo-firmware">6.2. Funcard demo firmware</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">6.2.1. Compilation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-in-the-atmega8515-card">6.2.2. Loading in the ATMega8515 card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-the-testing-scripts">6.2.3. Using the testing scripts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="publi.html">7. Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">8. Roadmap</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">LEIA</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li><span class="section-number">6. </span>Demonstration and educational tools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/tools.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="demonstration-and-educational-tools">
+<span id="tools"></span><h1><span class="section-number">6. </span>Demonstration and educational tools<a class="headerlink" href="#demonstration-and-educational-tools" title="Permalink to this headline">¶</a></h1>
+<p>Some tools have been published by H2Lab in order to demonstrate some ways to use the Leia board.</p>
+<div class="section" id="smartleia-target-applet">
+<h2><span class="section-number">6.1. </span>Smartleia target applet<a class="headerlink" href="#smartleia-target-applet" title="Permalink to this headline">¶</a></h2>
+<p>Smartleia target applet for testing APDUs and cryptography that can be found on the following repository: <a class="reference external" href="https://github.com/h2lab/smartleia-target-applet.git">https://github.com/h2lab/smartleia-target-applet.git</a></p>
+<div class="section" id="purpose-of-the-applet">
+<h3><span class="section-number">6.1.1. </span>Purpose of the applet<a class="headerlink" href="#purpose-of-the-applet" title="Permalink to this headline">¶</a></h3>
+<p>The purpose of the applet is to provide:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Tests for APDU cases 1, 2, 3 and 4 (for short and extended APDUs), as well as time extensions. Please refer to the ISO7816-3 standard for more information on this.</p></li>
+<li><p>Tests for AES computations using the Javacard API.</p></li>
+</ul>
+</div></blockquote>
+<p>The details of the APDU commands and expected responses are provided in the cmd.txt file, where the opensc tool is used as a command line way of cimmunicating with the smart card.</p>
+</div>
+<div class="section" id="compilation">
+<h3><span class="section-number">6.1.2. </span>Compilation<a class="headerlink" href="#compilation" title="Permalink to this headline">¶</a></h3>
+<p>In order to compile the project, you will need java with JDK of version 8 or 11, this is a strong requirement from ant-javacard as reminded here. You can fetch OpenJDK versions from AdoptOpenJDK.</p>
+<p>The 3.0.3 Javacard SDK (jc303_kit) (Javacard API 3.0.1) is also needed, and must be downloaded and put in the sdk folder. You can find Javacard SDKs for example here. Just drop the jc303_kit folder in it as explained in sdks/README.txt.</p>
+<p>When this is done, you can compile the applet using a simple:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make
+</pre></div>
+</div>
+</div>
+<div class="section" id="pushing-the-applet">
+<h3><span class="section-number">6.1.3. </span>Pushing the applet<a class="headerlink" href="#pushing-the-applet" title="Permalink to this headline">¶</a></h3>
+<p>Pushing the applet uses the gp.jar tool, and can be done, having the LEIA-Solo connected, using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make push
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="funcard-demo-firmware">
+<h2><span class="section-number">6.2. </span>Funcard demo firmware<a class="headerlink" href="#funcard-demo-firmware" title="Permalink to this headline">¶</a></h2>
+<p>A Funcard weak cryptographic implementation is proposed on the following repository: <a class="reference external" href="https://github.com/h2lab/smartleia-target-funcard">https://github.com/h2lab/smartleia-target-funcard</a></p>
+<p>This software handle an unprotected AES128 encryption, as well as a dummy PIN code verification algorithm.
+The implementations have been tested on a WB Electronics 64 Kbit ATMega chipcard.</p>
+<div class="section" id="id1">
+<h3><span class="section-number">6.2.1. </span>Compilation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Go to the src/ folder and run make. You must have avr-gcc, e.g. from avr-gcc, and the avr-libc installed on your PC: these are usually packaged with popular distros such as Debian or Ubuntu. Make should create aes-&lt;DDMMYY&gt;-&lt;HHMMSS&gt;.hex and eedata-&lt;DDMMYY&gt;-&lt;HHMMSS&gt;.hex in the src/build/ folder.</p>
+</div>
+<div class="section" id="loading-in-the-atmega8515-card">
+<h3><span class="section-number">6.2.2. </span>Loading in the ATMega8515 card<a class="headerlink" href="#loading-in-the-atmega8515-card" title="Permalink to this headline">¶</a></h3>
+<p>Load the files eedata.hex (in EEPROM int.) and aes-&lt;DDMMYY&gt;-&lt;HHMMSS&gt;.hex (in FLASH) in the ATMega8515 component. You can for instance use the Infinity USB Unlimited Reader and IDE from WB Electronics for this step.</p>
+<p>If you have a recent LEIA board connected with the flashing mode feature, you can simply execute the local flashing script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sh flash_funcard.sh
+</pre></div>
+</div>
+<p>This will compile and push the firmware on the funcard inserted in your LEIA board.</p>
+</div>
+<div class="section" id="using-the-testing-scripts">
+<h3><span class="section-number">6.2.3. </span>Using the testing scripts<a class="headerlink" href="#using-the-testing-scripts" title="Permalink to this headline">¶</a></h3>
+<p>Two test scripts are provided here: <code class="docutils literal notranslate"><span class="pre">script-AES128-enc.py</span></code> and <code class="docutils literal notranslate"><span class="pre">pin_timing_attacks.py</span></code>.</p>
+<p>The testing scripts are mainly Python based, and have been tested with Python3. The dependency requirements for these scripts are:</p>
+<blockquote>
+<div><p>The smartleia package in its version v1.0.1-1 at least (this contains a small fix for funcards usage through PCSC relay), available here.
+The pyscard, numpy and crypto packages, all available with pip.</p>
+</div></blockquote>
+<p>Each of these scripts can be used in two modes: using LEIA’s direct access through /dev/ttyACMx with the toggle USE_LEIA=True as an environment variable, or using PCSC daemon either through a regular smart card reader (or LEIA in PCSC relay mode) by using the toggle USE_LEIA=False as an environment variable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nv">USE_LEIA</span><span class="o">=</span>False python3 pin_timing_attacks.py
+<span class="o">[</span>+<span class="o">]</span> Using PCSC reader
+...
+$ <span class="nv">USE_LEIA</span><span class="o">=</span>True python3 pin_timing_attacks.py
+<span class="o">[</span>+<span class="o">]</span> Using LEIA raw access
+...
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">script-AES128-enc.py</span></code> tests AES-128 encryption and decryption APDUs: this can be a basis to mount some side-channel attacks on an unprotected AES (NOTE: although some APDUs setting masks are present, these are not used and are here for future evolutions).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">pin_timing_attacks.py</span></code> extracts a secret PIN from the programmed funcard using a timing attack that exploits the dummy algorithm used to check the PIN. In order for this attack to succeed, a timing oracle is needed. Since such a timing oracle exploits variations of less than milliseconds, a proper time measurement for APDUs is necessary. This script shows that LEIA’s timing feature can be of use here: a regular smart card reader is not able to extract the secret (at least with the basic approach used using LEIA). You can test LEIA’s timing extraction with the USE_LEIA=True, and PCSC based (using a regular reader or LEIA in PCSC mode) using the USE_LEIA=False toggle. The first one should extract the secret PIN successfully, while the second will not succeed.</p>
+</div>
+</div>
+</div>
+
+    <script type="text/javascript">
+        function init() {
+            WaveDrom.ProcessAll();
+        }
+        window.onload = init;
+    </script>
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="publi.html" class="btn btn-neutral float-right" title="7. Publications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api.html" class="btn btn-neutral float-left" title="5. Python API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2019-2020, ANSSI.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

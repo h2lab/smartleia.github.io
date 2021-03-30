@@ -12,6 +12,7 @@ More details about the the project can be found in the :ref:`publi` section.
 
 To experiment with LEIA, you can directly go to the :ref:`quickstart` section.
 
+.. info: the hardware chapter is commented out while not yet set
 
 .. toctree::
    :caption: Table of Contents
@@ -22,9 +23,9 @@ To experiment with LEIA, you can directly go to the :ref:`quickstart` section.
    About the LEIA project <target>
    Installation <installation>
    Quickstart <quickstart>
-   Hardware <hard>
    Firmware <c/test>
    Python API <api>
+   Other tools <tools>
    Publications <publi>
    Roadmap <roadmap>
 
